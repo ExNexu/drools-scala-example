@@ -23,4 +23,10 @@ libraryDependencies ++= {
       .map("org.drools" % _ % droolsVersion)
 }
 
+val classesJarLocation = "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar"
+
+fullClasspath in Test += Attributed.blank(file(classesJarLocation))
+
+//fullClasspath in Runtime += Attributed.blank(file(classesJarLocation))
+
 initialCommands := "import us.bleibinha.droolsscalaexample._"
