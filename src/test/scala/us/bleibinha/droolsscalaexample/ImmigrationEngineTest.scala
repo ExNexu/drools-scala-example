@@ -15,7 +15,7 @@ class ImmigrationEngineTest extends FunSpec with ShouldMatchers {
         val immigrationFacts = eligibleApplicant :: inEligibleApplicant :: experience :: Nil
         val eligibleApplicants = ImmigrationEngine.determineEligibleApplicants(immigrationFacts)
         eligibleApplicants should contain(eligibleApplicant)
-        eligibleApplicants should not contain (inEligibleApplicant)
+        eligibleApplicants should not contain(inEligibleApplicant)
       }
 
       it("should be eligible with a bachelor and 2 years of experience in the same field") {
