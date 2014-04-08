@@ -10,38 +10,42 @@ class ImmigrationEngineTest extends FunSpec with ShouldMatchers {
 
       it("should be eligible with 5 years of experience") {
         val eligibleApplicant = Applicant(18, "Max")
-        val inEligibleApplicant = Applicant(18, "Michael")
-        val experience = Experience(eligibleApplicant, 5, "Software Engineering")
-        val immigrationFacts = eligibleApplicant :: inEligibleApplicant :: experience :: Nil
+        val ineligibleApplicant = Applicant(18, "Michael")
+        val experiences =
+          List(
+            Experience(eligibleApplicant, 5, "Software Engineering"),
+            Experience(ineligibleApplicant, 4, "Software Engineering")
+          )
+        val immigrationFacts = eligibleApplicant :: ineligibleApplicant :: experiences
         val eligibleApplicants = ImmigrationEngine.determineEligibleApplicants(immigrationFacts)
         eligibleApplicants should contain(eligibleApplicant)
-        eligibleApplicants should not contain(inEligibleApplicant)
+        eligibleApplicants should not contain ineligibleApplicant
       }
 
       it("should be eligible with a bachelor and 2 years of experience in the same field") {
         val eligibleApplicant = Applicant(18, "Max")
-        val inEligibleApplicant1 = Applicant(18, "Michael")
-        val inEligibleApplicant2 = Applicant(18, "Sven")
+        val ineligibleApplicant1 = Applicant(18, "Michael")
+        val ineligibleApplicant2 = Applicant(18, "Sven")
         val applicants =
           List(
             eligibleApplicant,
-            inEligibleApplicant1,
-            inEligibleApplicant2
+            ineligibleApplicant1,
+            ineligibleApplicant2
           )
         val qualifications =
           List(
             Qualification(eligibleApplicant, BachelorQualification, "Software Engineering"),
-            Qualification(inEligibleApplicant2, BachelorQualification, "Software Engineering")
+            Qualification(ineligibleApplicant1, BachelorQualification, "Software Engineering")
           )
         val experiences =
           List(
             Experience(eligibleApplicant, 2, "Software Engineering"),
-            Experience(inEligibleApplicant2, 2, "Waitressing")
+            Experience(ineligibleApplicant1, 2, "Waitressing")
           )
         val immigrationFacts = applicants ++ qualifications ++ experiences
         val eligibleApplicants = ImmigrationEngine.determineEligibleApplicants(immigrationFacts)
         eligibleApplicants should contain(eligibleApplicant)
-        eligibleApplicants should contain noneOf(inEligibleApplicant1, inEligibleApplicant2)
+        eligibleApplicants should contain noneOf(ineligibleApplicant1, ineligibleApplicant2)
       }
 
       it("should be eligible with a master") {
