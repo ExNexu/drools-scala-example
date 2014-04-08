@@ -1,0 +1,108 @@
+package us.bleibinha.droolsscalaexample
+
+import java.util.List
+import us.bleibinha.droolsscalaexample.*
+
+global List eligibleApplicants
+
+declare IsEligible
+   applicant : Applicant
+end
+
+declare IsAdult
+   applicant : Applicant
+end
+
+/*
+ * Check adult
+ */
+
+rule "Is adult"
+    when
+        $a: Applicant(age >= 18)
+    then
+        System.out.println("Applicant '" + $a.name() + "' is an adult.");
+        insertLogical(new IsAdult($a));
+end
+
+/*
+ * Single applicant
+ */
+
+rule "Adult applicant has five years of experience in one field"
+    when
+        $a: Applicant()
+        not(IsEligible(applicant == $a))
+        IsAdult(applicant == $a)
+        Experience(applicant == $a, years >= 5)
+    then
+        System.out.println(
+            "Applicant '" + $a.name() + "' is eligible, because they have five years of work experience."
+        );
+        insert(new IsEligible($a));
+        eligibleApplicants.add($a);
+end
+
+rule "Adult applicant has a bachelor and two years of experience in the same field"
+    when
+        $a: Applicant()
+        not(IsEligible(applicant == $a))
+        IsAdult(applicant == $a)
+        Qualification(applicant == $a, level().numeric() >= BachelorQualification$.numeric(), $field: field)
+        Experience(applicant == $a, field == $field, years >= 2)
+    then
+        System.out.println(
+            "Applicant '" + $a.name() +
+            "' is eligible, because they have a bachelor and two years of work experience in the same field."
+        );
+        insert(new IsEligible($a));
+        eligibleApplicants.add($a);
+end
+
+rule "Adult applicant has a master"
+    when
+        $a: Applicant()
+        not(IsEligible(applicant == $a))
+        IsAdult(applicant == $a)
+        Qualification(applicant == $a, level().numeric() >= MasterQualification.numeric())
+    then
+        System.out.println("Applicant '" + $a.name() + "' is eligible, because they have a master.");
+        insert(new IsEligible($a));
+        eligibleApplicants.add($a);
+end
+
+/*
+ * Relatives
+ */
+
+rule "Children of an eligable adult"
+    when
+        $a: Applicant($relatives: relatives)
+        IsEligible(applicant == $a)
+        $relative: Applicant() from $relatives
+        not(IsAdult(applicant == $relative))
+        not(IsEligible(applicant == $relative))
+    then
+        System.out.println(
+            "Applicant '" + $a.name() + "' is eligible, because they are the child of an eligible adult."
+        );
+        insert(new IsEligible($relative));
+        eligibleApplicants.add($relative);
+end
+
+rule "Relatives of an adult with master and two years of experience in the same field"
+    when
+        $a: Applicant($relatives: relatives)
+        IsEligible(applicant == $a)
+        Qualification(applicant == $a, level().numeric() >= MasterQualification.numeric(), $field: field)
+        Experience(applicant == $a, field == $field, years >= 2)
+        $relative: Applicant() from $relatives
+        not(IsEligible(applicant == $relative))
+    then
+        System.out.println(
+            "Applicant '" + $a.name() +
+            "' is eligible, because they have a relative with a master and two years of experience in the same field."
+        );
+        insert(new IsEligible($relative));
+        eligibleApplicants.add($relative);
+end
