@@ -1,17 +1,21 @@
 package us.bleibinha.droolsscalaexample
 
 import scala.beans.BeanInfo
+import scala.collection.JavaConversions.seqAsJavaList
 
 sealed trait ImmigrationFact
 
 @BeanInfo
-case class Applicant(age: Int, name: String, relatives: List[Applicant] = Nil) extends ImmigrationFact
+case class Applicant(age: Int, name: String, relativeNames: List[String] = Nil) extends ImmigrationFact {
+  def relativeNamesJavaList: java.util.List[String] = relativeNames
+}
 
 object Family {
-  def apply(applicants: Seq[Applicant]): Seq[Applicant] =
-    applicants map { applicant ⇒
-      val relatives = applicants.filterNot(_ == applicant).toList
-      applicant.copy(relatives = relatives)
+  def apply(applicants: List[Applicant]): List[Applicant] =
+    applicants map {
+      applicant ⇒
+        val relativeNames = applicants.filterNot(_ == applicant).map(_.name).toList
+        applicant.copy(relativeNames = relativeNames)
     }
 }
 
@@ -19,10 +23,16 @@ object Family {
 case class Experience(applicant: Applicant, years: Int, field: String) extends ImmigrationFact
 
 sealed abstract class QualificationLevel(val displayName: String, val numeric: Int) extends ImmigrationFact
+
 case object BasicQualification extends QualificationLevel("Basic qualification", 0)
+
 case object BachelorQualification extends QualificationLevel("Bachelor", 1)
+
 case object MasterQualification extends QualificationLevel("Master", 2)
+
 case object PhdQualification extends QualificationLevel("Phd", 3)
 
 @BeanInfo
-case class Qualification(applicant: Applicant, level: QualificationLevel, field: String) extends ImmigrationFact
+case class Qualification(applicant: Applicant, level: QualificationLevel, field: String) extends ImmigrationFact {
+  def numeric = level.numeric
+}

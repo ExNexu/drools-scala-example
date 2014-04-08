@@ -48,7 +48,7 @@ rule "Adult applicant has a bachelor and two years of experience in the same fie
         $a: Applicant()
         not(IsEligible(applicant == $a))
         IsAdult(applicant == $a)
-        Qualification(applicant == $a, level().numeric() >= BachelorQualification$.numeric(), $field: field)
+        Qualification(applicant == $a, numeric() >= BachelorQualification.numeric(), $field: field)
         Experience(applicant == $a, field == $field, years >= 2)
     then
         System.out.println(
@@ -64,7 +64,7 @@ rule "Adult applicant has a master"
         $a: Applicant()
         not(IsEligible(applicant == $a))
         IsAdult(applicant == $a)
-        Qualification(applicant == $a, level().numeric() >= MasterQualification.numeric())
+        Qualification(applicant == $a, numeric() >= MasterQualification.numeric())
     then
         System.out.println("Applicant '" + $a.name() + "' is eligible, because they have a master.");
         insert(new IsEligible($a));
@@ -77,14 +77,15 @@ end
 
 rule "Children of an eligable adult"
     when
-        $a: Applicant($relatives: relatives)
+        $a: Applicant($relativeNames: relativeNamesJavaList())
         IsEligible(applicant == $a)
-        $relative: Applicant() from $relatives
+        $relativeName: String() from $relativeNames
+        $relative: Applicant(name == $relativeName)
         not(IsAdult(applicant == $relative))
         not(IsEligible(applicant == $relative))
     then
         System.out.println(
-            "Applicant '" + $a.name() + "' is eligible, because they are the child of an eligible adult."
+            "Applicant '" + $relative.name() + "' is eligible, because they are the child of an eligible adult."
         );
         insert(new IsEligible($relative));
         eligibleApplicants.add($relative);
@@ -92,15 +93,16 @@ end
 
 rule "Relatives of an adult with master and two years of experience in the same field"
     when
-        $a: Applicant($relatives: relatives)
+        $a: Applicant($relativeNames: relativeNamesJavaList())
         IsEligible(applicant == $a)
-        Qualification(applicant == $a, level().numeric() >= MasterQualification.numeric(), $field: field)
+        Qualification(applicant == $a, numeric() >= MasterQualification.numeric(), $field: field)
         Experience(applicant == $a, field == $field, years >= 2)
-        $relative: Applicant() from $relatives
+        $relativeName: String() from $relativeNames
+        $relative: Applicant(name == $relativeName)
         not(IsEligible(applicant == $relative))
     then
         System.out.println(
-            "Applicant '" + $a.name() +
+            "Applicant '" + $relative.name() +
             "' is eligible, because they have a relative with a master and two years of experience in the same field."
         );
         insert(new IsEligible($relative));

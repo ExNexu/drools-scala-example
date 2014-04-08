@@ -8,6 +8,7 @@ object Kie {
   private lazy val kContainer: KieContainer = kieServices.getKieClasspathContainer()
 
   lazy val statelessSession: StatelessKieSession = kContainer.newStatelessKieSession()
+
   def execute(facts: List[Any]) = statelessSession.execute(facts)
 
   def session = kContainer.newKieSession()

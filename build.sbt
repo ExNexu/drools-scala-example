@@ -19,8 +19,8 @@ resolvers += "JBoss public" at "http://repository.jboss.org/nexus/content/groups
 
 libraryDependencies ++= {
   "org.kie" % "kie-api" % droolsVersion ::
-  List("drools-compiler", "drools-core","drools-jsr94", "drools-decisiontables", "knowledge-api")
-    .map("org.drools" % _ % droolsVersion)
+    List("drools-compiler", "drools-core", "drools-jsr94", "drools-decisiontables", "knowledge-api")
+      .map("org.drools" % _ % droolsVersion)
 }
 
 initialCommands := "import us.bleibinha.droolsscalaexample._"
