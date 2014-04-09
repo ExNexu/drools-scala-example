@@ -22,7 +22,7 @@ object Family {
 @BeanInfo
 case class Experience(applicant: Applicant, years: Int, field: String) extends ImmigrationFact
 
-sealed abstract class QualificationLevel(val displayName: String, val numeric: Int) extends ImmigrationFact
+sealed abstract class QualificationLevel(val displayName: String, val numeric: Int)
 
 case object BasicQualification extends QualificationLevel("Basic qualification", 0)
 
